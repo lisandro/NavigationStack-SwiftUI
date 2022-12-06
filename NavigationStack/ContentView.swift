@@ -14,6 +14,11 @@ struct ContentView: View {
                                  .init(name: "PC", imageName: "pc", color: .pink),
                                  .init(name: "Mobile", imageName: "iphone", color: .mint),]
     
+    var games: [Game] = [.init(name: "Minecraft", rating: "99"),
+                         .init(name: "God of war", rating: "98"),
+                         .init(name: "Fornite", rating: "92"),
+                         .init(name: "Madden 2023", rating: "88"),]
+    
     var body: some View {
         NavigationStack {
             List {
@@ -25,6 +30,14 @@ struct ContentView: View {
                         }
                     }
                 }
+                
+                Section("Games") {
+                    ForEach(games, id: \.name) { game in
+                        NavigationLink(value: game) {
+                            Text(game.name)
+                        }
+                    }
+                }
             }
             .navigationTitle("Gaming")
             .navigationDestination(for: Platform.self) { platform in
@@ -33,6 +46,10 @@ struct ContentView: View {
                     Label(platform.name, systemImage: platform.imageName)
                         .font(.largeTitle).bold()
                 }
+            }
+            .navigationDestination(for: Game.self) { game in
+                Text("\(game.name) - \(game.rating)")
+                    .font(.largeTitle.bold())
             }
         }
     }
@@ -47,4 +64,9 @@ struct ContentView_Previews: PreviewProvider {
 struct Platform: Hashable {
     let name, imageName: String
     let color: Color
+}
+
+struct Game: Hashable {
+    let name: String
+    let rating: String
 }
