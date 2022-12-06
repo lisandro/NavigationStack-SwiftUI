@@ -19,7 +19,8 @@ struct ContentView: View {
                          .init(name: "Fornite", rating: "92"),
                          .init(name: "Madden 2023", rating: "88"),]
     
-    @State private var path: [Game] = []
+    //NavigationPath can be serialized to restore states
+    @State private var path = NavigationPath()
     
     var body: some View {
         NavigationStack(path: $path) {
@@ -34,13 +35,10 @@ struct ContentView: View {
                 }
                 
                 Section("Games") {
-//                    ForEach(games, id: \.name) { game in
-//                        NavigationLink(value: game) {
-//                            Text(game.name)
-//                        }
-//                    }
-                    Button("Add Games") {
-                        path = games
+                    ForEach(games, id: \.name) { game in
+                        NavigationLink(value: game) {
+                            Text(game.name)
+                        }
                     }
                 }
             }
@@ -48,13 +46,37 @@ struct ContentView: View {
             .navigationDestination(for: Platform.self) { platform in
                 ZStack {
                     platform.color.ignoresSafeArea()
-                    Label(platform.name, systemImage: platform.imageName)
-                        .font(.largeTitle).bold()
+                    VStack {
+                        Label(platform.name, systemImage: platform.imageName)
+                            .font(.largeTitle).bold()
+                        
+                        List {
+                            ForEach(games, id: \.name) { game in
+                                NavigationLink(value: game) {
+                                    Text(game.name)
+                                }
+                            }
+                        }
+                    }
                 }
             }
             .navigationDestination(for: Game.self) { game in
-                Text("\(game.name) - \(game.rating)")
-                    .font(.largeTitle.bold())
+                VStack(spacing: 20) {
+                    Text("\(game.name) - \(game.rating)")
+                        .font(.largeTitle.bold())
+                    
+                    Button("Recommended game") {
+                        path.append(games.randomElement()!)
+                    }
+                    
+                    Button("Go to another platform") {
+                        path.append(platforms.randomElement()!)
+                    }
+                    
+                    Button("Go Home") {
+                        path.removeLast(path.count)
+                    }
+                }
             }
         }
     }
